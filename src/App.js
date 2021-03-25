@@ -1,13 +1,24 @@
 import './App.css';
-import {FormControl, MenuItem, Select} from "@material-ui/core";
+import {FormControl, MenuItem, Select, Card, CardContent, responsiveFontSizes} from "@material-ui/core";
 import {useState, useEffect} from "react";
 import InfoBox from "./InfoBox";
+import Map from "./Map";
 
 function App() {
 
     const [countries, setCountries] = useState([]);
 
     const [selectedCountry, setSelectedCountry] = useState("worldwide");
+
+    const [countryInfo, setCountryInfo] = useState({});
+
+    useEffect( ()=> {
+        fetch("https://disease.sh/v3/covid-19/all")
+            .then(response=>response.json())
+            .then(data=> {
+                setCountryInfo(data);
+            });
+    },[]);
 
     useEffect(() => {
         const getCountriesData = async () => {
@@ -30,13 +41,26 @@ function App() {
         const countryCode = event.target.value;
         //console.log("selected country code is :"+countryCode);
         setSelectedCountry(countryCode);
-    }
+
+        // Worldwide statistics endpoint : https://disease.sh/v3/covid-19/all
+        //Specific country endpoint : //https://disease.sh/v3/covid-19/countries/[COUNTRY_CODE]
+
+        //using ternary operator to set desired endpoint
+        const endPoint =  countryCode === 'worldwide' ? 'https://disease.sh/v3/covid-19/all' : `https://disease.sh/v3/covid-19/countries/${countryCode}`
+
+        await fetch(endPoint)
+            .then(response =>response.json())
+            .then(data => {
+                setCountryInfo(data);
+            });
+    };
+    console.log("Country Info>>", countryInfo);
 
 
   return (
     <div className="app">
-
-        <div className="app__header">
+        <div className="app__left">
+            <div className="app__header">
             <h1>Covid 19 Tracker </h1>
 
             <FormControl className="app__dropdown">
@@ -55,25 +79,42 @@ function App() {
 
                 </Select>
             </FormControl>
-
         </div>
 
 
-        {/* Info Boxes */}
-    <div className="app__stats">
-        <InfoBox title="Coronvirus Cases" cases={5000} total={123} />
-        <InfoBox title="Recovered" cases={2000} total={1234} />
-        <InfoBox title="Deaths" cases={3000} total={12345} />
+            {/* Info Boxes */}
+            <div className="app__stats">
+        <InfoBox
+            title="Coronvirus Cases"
+            cases={countryInfo.todayCases}
+            total={countryInfo.cases} />
+
+        <InfoBox
+            title="Recovered"
+            cases={countryInfo.todayRecovered}
+            total={countryInfo.recovered} />
+
+        <InfoBox title="Deaths"
+                 cases={countryInfo.todayDeaths}
+                 total={countryInfo.deaths} />
     </div>
 
 
+            {/* Map */}
+            <Map/>
+        </div>
 
+        <div className="app__right">
+            {/* Table with countries and cases details */}
+            <Card>
+                <CardContent>
+                    <h3>Live Cases by Country</h3>
 
-
-    {/* Table with countries and cases details */}
-    {/* Graph */}
-
-    {/* Map */}
+                 {/* Graph */}
+                <h3> Worldwide new Cases </h3>
+                </CardContent>
+            </Card>
+        </div>
     </div>
   );
 }
