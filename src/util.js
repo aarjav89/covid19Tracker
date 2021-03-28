@@ -4,7 +4,7 @@ export const sortData = (data) => {
 
     sortedData.sort((a,b) => {
         if(a.cases > b.cases) {
-            return -1;
+            return -1; //since we want the highest number of cases on top (descending order of sorting)..
         }
             else{
                 return 1;
