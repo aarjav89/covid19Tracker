@@ -1,5 +1,6 @@
 # Getting Started with Create React App
 
+Created a COVID-19 Tracker with API provided by disease.sh - an excellent resource for live data for covid cases worldwide. 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
