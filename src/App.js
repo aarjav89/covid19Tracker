@@ -18,7 +18,7 @@ function App() {
 
     const [tableData, setTableData] = useState([]);
 
-    const [mapCenter, setMapCenter] = useState({lat:34.80746, lng: -40.4796});
+    const [mapCenter, setMapCenter] = useState({lat:20, lng: 77});
 
     const [mapZoom, setMapZoom] = useState(3);
 
@@ -52,21 +52,25 @@ function App() {
     const onCountryChange = async (event) => {
         const countryCode = event.target.value;
         //console.log("selected country code is :"+countryCode);
-        setSelectedCountry(countryCode);
+
 
         // Worldwide statistics endpoint : https://disease.sh/v3/covid-19/all
         //Specific country endpoint : //https://disease.sh/v3/covid-19/countries/[COUNTRY_CODE]
 
         //using ternary operator to set desired endpoint
-        const endPoint =  countryCode === 'worldwide' ? 'https://disease.sh/v3/covid-19/all' : `https://disease.sh/v3/covid-19/countries/${countryCode}`
+        const endPoint =  countryCode === "worldwide" ? 'https://disease.sh/v3/covid-19/all' : `https://disease.sh/v3/covid-19/countries/${countryCode}`
 
         await fetch(endPoint)
             .then(response =>response.json())
             .then(data => {
+                setSelectedCountry(countryCode);
                 setCountryInfo(data);
+                console.log("Setting lat to:",data.countryInfo.lat, "and long is:", data.countryInfo.long);
+                setMapCenter([data.countryInfo.lat, data.countryInfo.long]);
+                setMapZoom(4);
             });
     };
-    console.log("Country Info>>", countryInfo);
+   // console.log("Country Info>>", countryInfo);
 
 
   return (
